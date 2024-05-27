@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:owo/face_text.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'settings_page.dart';
-import 'Theme/color_scheme.dart';
+import '../Theme/color_scheme.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -47,6 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
     _face = FaceText();
+    _face_text = "OwO";
     // 定期更新界面以反映 FaceText 的变化
     _updateTimer = Timer.periodic(Duration(milliseconds: 100), (timer) {
       setState(() {

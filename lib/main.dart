@@ -1,14 +1,18 @@
+import 'dart:async';
+
+import 'dart:ui' as ui;
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:owo/global_data.dart';
-import 'package:owo/settings_page.dart';
+import 'package:owo/Pages/settings_page.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // 界面
-import 'home_page.dart';
+import 'Pages/home_page.dart';
+import 'Pages/splash_page.dart';
 
 
-void main() {
+void main() async {
   runApp(const MyApp());
 }
 
@@ -23,23 +27,32 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  late ThemeMode _themeMode;
+  late Future<ThemeMode> _themeMode;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _themeMode = getThemeMode();
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    PreferencesManager.instance.init();
-    _themeMode = getThemeMode();
-    return MaterialApp(
-      title: '（〃｀ 3′〃）',
-      theme: FlexThemeData.light(scheme: FlexScheme.mandyRed),
-      // The Mandy red, dark theme.
-      darkTheme: FlexThemeData.dark(scheme: FlexScheme.mandyRed),
-      // Use dark or light theme based on system setting.
-      themeMode: _themeMode,
-      routes: {
-        '/': (context) => MyHomePage(title: 'OwO'),
-        '/settings': (context) => SettingsPage(setThemeFunc: setThemeMode),
+    return FutureBuilder(
+      future: _themeMode,
+      builder: (context, snapshot) {
+        final ThemeMode themeMode = snapshot.data ?? ThemeMode.system;
+        return MaterialApp(
+          title: '（〃｀ 3′〃）',
+          theme: FlexThemeData.light(scheme: FlexScheme.mandyRed),
+          darkTheme: FlexThemeData.dark(scheme: FlexScheme.mandyRed),
+          themeMode: themeMode,
+          routes: {
+            '/': (context) => MyHomePage(title: 'OwO'),
+            '/settings': (context) => SettingsPage(setThemeFunc: setThemeMode),
+          },
+        );
       },
     );
   }
@@ -47,16 +60,19 @@ class _MyAppState extends State<MyApp> {
   void setThemeMode(String theme) {
     setState(() {
       PreferencesManager.instance.setString("theme", theme);
-      if (theme == "dark") { _themeMode = ThemeMode.dark; return; }
-      if (theme == "light") { _themeMode = ThemeMode.light; return; }
+      if (theme == "dark") { _themeMode = ThemeMode.dark as Future<ThemeMode>; return; }
+      if (theme == "light") { _themeMode = ThemeMode.light as Future<ThemeMode>; return; }
       throw Exception("invalid theme type");
     });
   }
 
-  ThemeMode getThemeMode() {
-    String? theme = PreferencesManager.instance.getStringOrDefault("theme", "light");
+  // 假设这是您的异步函数，返回 Future<Theme>
+  Future<ThemeMode> getThemeMode() async {
+    String theme = await PreferencesManager.instance.getStringOrDefault("theme", "light"); // 模拟异步操作
     if (theme == "dark") { return ThemeMode.dark; }
     if (theme == "light") { return ThemeMode.light; }
     return ThemeMode.system;
   }
+
+
 }
