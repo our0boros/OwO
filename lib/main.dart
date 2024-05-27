@@ -47,16 +47,14 @@ class _MyAppState extends State<MyApp> {
   void setThemeMode(String theme) {
     setState(() {
       PreferencesManager.instance.setString("theme", theme);
-      if (theme == "system") { _themeMode = ThemeMode.system; return; }
       if (theme == "dark") { _themeMode = ThemeMode.dark; return; }
       if (theme == "light") { _themeMode = ThemeMode.light; return; }
-      _themeMode = ThemeMode.system;
+      throw Exception("invalid theme type");
     });
   }
 
   ThemeMode getThemeMode() {
-    String? theme = PreferencesManager.instance.getStringOrDefault("theme", "system");
-    if (theme == "system") { return ThemeMode.system; }
+    String? theme = PreferencesManager.instance.getStringOrDefault("theme", "light");
     if (theme == "dark") { return ThemeMode.dark; }
     if (theme == "light") { return ThemeMode.light; }
     return ThemeMode.system;
